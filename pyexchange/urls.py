@@ -9,6 +9,7 @@ from rest_framework_simplejwt.views import (
 
 router = routers.DefaultRouter()
 router.register(r'api/currencies', views.CurrencyViewSet)
+router.register(r'api/user-currencies', views.UserCurrencyViewSet)
 
 # Wire up our API using automatic URL routing.
 urlpatterns = [
