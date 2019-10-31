@@ -9,12 +9,12 @@ class Profile(models.Model):
     money = models.IntegerField(default=0)
 
     @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
+    def create_profile(sender, instance, created, **kwargs):
         if created:
             Profile.objects.create(user=instance)
 
     @receiver(post_save, sender=User)
-    def save_user_profile(sender, instance, **kwargs):
+    def save_profile(sender, instance, **kwargs):
         instance.profile.save()
 
 
