@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -5,9 +6,9 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import (
     CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 )
-from pyexchange.serializers import CurrencySerializer, UserCurrencySerializer
+from pyexchange.serializers import CurrencySerializer, UserCurrencySerializer, UserSerializer
 from pyexchange.models import Currency, UserCurrency, Profile
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from django.db import transaction
 
 
@@ -18,16 +19,8 @@ class CurrencyViewSet(GenericViewSet, ListModelMixin):
 
 
 class UserCurrencyViewSet(GenericViewSet):
-    permission_classes = [IsAuthenticated]
     queryset = UserCurrency.objects.all().order_by('name')
     serializer_class = UserCurrencySerializer
-
-    @action(detail=False, methods=['get'])
-    def get_mine(self, request):
-        user = request.user
-        filtered_currencies = UserCurrency.objects.filter(owner_id=user.id)
-        serialized_data = UserCurrencySerializer(filtered_currencies, many=True).data
-        return Response(serialized_data)
 
     @action(detail=True, methods=['post'])
     def buy(self, request, pk):
@@ -47,3 +40,14 @@ class UserCurrencyViewSet(GenericViewSet):
             profile.save()
             user_currency.save()
         return Response({'currency-amount': user_currency.amount}, status=status.HTTP_200_OK)
+
+
+class UserViewSet(GenericViewSet):
+    queryset = User.objects.all()
+    detail_serializer_class = UserSerializer
+
+    @action(detail=False, methods=['get'])
+    def get(self, request):
+        user = request.user
+        serialized_user = UserSerializer(instance=user).data
+        return Response(serialized_user)

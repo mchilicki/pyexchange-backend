@@ -11,36 +11,38 @@ class ProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(read_only=True)
-
-    class Meta:
-        model = User
-        fields = (
-            'id', 'username', 'profile'
-        )
-
-
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
         fields = (
-            'id', 'name', 'code', 'unit', 'purchase_price', 'sell_price'
+            'id', 'name', 'code', 'unit', 'purchase_price'
+        )
+
+
+class BoughtCurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = (
+            'id', 'name', 'code', 'unit', 'sell_price'
         )
 
 
 class UserCurrencySerializer(serializers.ModelSerializer):
-    currency = CurrencySerializer(read_only=True)
-    owner = UserSerializer(read_only=True)
+    currency = BoughtCurrencySerializer(read_only=True)
 
     class Meta:
         model = UserCurrency
         fields = (
-            'id', 'amount', 'currency', 'owner'
+            'id', 'amount', 'currency'
         )
 
 
+class UserSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+    currencies = UserCurrencySerializer(many=True, read_only=True)
 
-
-
-
+    class Meta:
+        model = User
+        fields = (
+            'id', 'username', 'profile', 'currencies'
+        )
