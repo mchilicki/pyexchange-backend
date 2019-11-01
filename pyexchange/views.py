@@ -1,7 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import (
     CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
@@ -36,11 +35,15 @@ class UserCurrencyViewSet(GenericViewSet):
         profile = Profile.objects.get(user=user)
         currency = Currency.objects.get(pk=pk)
         amount = request.data['amount']
+        user_money_costs = amount * currency.sell_price / currency.unit
+        if user_money_costs > profile.money:
+            return Response({'error': "User doesn't have enough founds"}, status=status.HTTP_400_BAD_REQUEST)
+        if amount % currency.unit != 0:
+            return Response({'error': "Amount is not multiple of unit"}, status=status.HTTP_400_BAD_REQUEST)
         with transaction.atomic():
             user_currency, created = UserCurrency.objects.get_or_create(currency=currency, owner=user)
-            if created:
-                user_currency.amount = amount
-            else:
-                user_currency.amount += amount
+            user_currency.amount += amount
+            profile.money -= user_money_costs
+            profile.save()
             user_currency.save()
-        return Response({'currency-amount': user_currency.amount})
+        return Response({'currency-amount': user_currency.amount}, status=status.HTTP_200_OK)
