@@ -27,7 +27,7 @@ class Currency(models.Model):
 
 
 class UserCurrency(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='currencies')
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
     amount = models.IntegerField(default=0)
 
