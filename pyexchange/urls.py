@@ -12,7 +12,6 @@ from drf_yasg import openapi
 
 router = routers.DefaultRouter()
 router.register(r'api/currencies', views.CurrencyViewSet)
-router.register(r'api/user-currencies', views.UserCurrencyViewSet)
 router.register(r'api/users', views.UserViewSet)
 
 

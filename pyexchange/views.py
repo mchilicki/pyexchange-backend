@@ -17,12 +17,7 @@ class CurrencyViewSet(GenericViewSet, ListModelMixin):
     queryset = Currency.objects.all().order_by('name')
     serializer_class = CurrencySerializer
 
-
-class UserCurrencyViewSet(GenericViewSet):
-    queryset = UserCurrency.objects.all().order_by('name')
-    serializer_class = UserCurrencySerializer
-
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def buy(self, request, pk):
         user = request.user
         profile = Profile.objects.get(user=user)
