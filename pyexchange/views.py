@@ -17,12 +17,7 @@ class CurrencyViewSet(GenericViewSet, ListModelMixin):
     queryset = Currency.objects.all().order_by('name')
     serializer_class = CurrencySerializer
 
-
-class UserCurrencyViewSet(GenericViewSet):
-    queryset = UserCurrency.objects.all().order_by('name')
-    serializer_class = UserCurrencySerializer
-
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def buy(self, request, pk):
         user = request.user
         profile = Profile.objects.get(user=user)
@@ -39,15 +34,14 @@ class UserCurrencyViewSet(GenericViewSet):
             profile.money -= user_money_costs
             profile.save()
             user_currency.save()
-        return Response({'currency-amount': user_currency.amount}, status=status.HTTP_200_OK)
+        return Response(UserSerializer(instance=user).data)
 
 
 class UserViewSet(GenericViewSet):
     queryset = User.objects.all()
     detail_serializer_class = UserSerializer
+    serializer_class = UserSerializer
 
     @action(detail=False, methods=['get'])
     def get(self, request):
-        user = request.user
-        serialized_user = UserSerializer(instance=user).data
-        return Response(serialized_user)
+        return Response(UserSerializer(instance=request.user).data)
