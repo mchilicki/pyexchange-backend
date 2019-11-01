@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pyexchange.apps.PyexchangeConfig',
     'rest_framework',
+    'drf_yasg',
 ]
 
 REST_FRAMEWORK = {
