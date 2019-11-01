@@ -9,6 +9,7 @@ from rest_framework.mixins import (
 from pyexchange.serializers import CurrencySerializer, UserCurrencySerializer
 from pyexchange.models import Currency, UserCurrency, Profile
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.db import transaction
 
 
 class CurrencyViewSet(GenericViewSet, ListModelMixin):
@@ -35,10 +36,11 @@ class UserCurrencyViewSet(GenericViewSet):
         profile = Profile.objects.get(user=user)
         currency = Currency.objects.get(pk=pk)
         amount = request.data['amount']
-        user_currency, created = UserCurrency.objects.get_or_create(currency=currency, owner=user)
-        if created:
-            user_currency.amount = amount
-        else:
-            user_currency.amount += amount
-        user_currency.save()
+        with transaction.atomic():
+            user_currency, created = UserCurrency.objects.get_or_create(currency=currency, owner=user)
+            if created:
+                user_currency.amount = amount
+            else:
+                user_currency.amount += amount
+            user_currency.save()
         return Response({'currency-amount': user_currency.amount})
