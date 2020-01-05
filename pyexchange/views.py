@@ -11,6 +11,8 @@ from pyexchange.models import Currency, UserCurrency, Profile
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from django.db import transaction
 
+from pyexchange.utils.users import is_username_free, is_email_free, check_password
+
 
 class CurrencyViewSet(GenericViewSet, ListModelMixin):
     permission_classes = [AllowAny]
@@ -42,6 +44,6 @@ class UserViewSet(GenericViewSet):
     detail_serializer_class = UserSerializer
     serializer_class = UserSerializer
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def get(self, request):
         return Response(UserSerializer(instance=request.user).data)
