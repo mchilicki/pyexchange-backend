@@ -47,3 +47,19 @@ class UserViewSet(GenericViewSet):
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def get(self, request):
         return Response(UserSerializer(instance=request.user).data)
+
+    @action(detail=False, methods=['post'])
+    def register(self, request):
+        username = request.data['username']
+        if not is_username_free(username):
+            return Response({'error': 'Selected username already exists'}, status=status.HTTP_409_CONFLICT)
+        email = request.data['email']
+        if not is_email_free(email):
+            return Response({'error': 'Selected email already exists'}, status=status.HTTP_409_CONFLICT)
+        password = request.data['password']
+        if not check_password(password):
+            return Response({'error': 'Password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            user = User.objects.create_user(username=username, email=email, password=password)
+            user.save()
+        return Response(UserSerializer(instance=user).data)
