@@ -31,8 +31,8 @@ schema_view = get_schema_view(
 # Wire up our API using automatic URL routing.
 urlpatterns = [
     path('', include(router.urls)),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('api/token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/refresh', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify', TokenVerifyView.as_view(), name='token_verify'),
+    path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
