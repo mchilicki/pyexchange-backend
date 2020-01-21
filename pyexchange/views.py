@@ -63,7 +63,7 @@ class CurrencyViewSet(GenericViewSet, ListModelMixin):
         else:
             return Response({'error': "User doesn't have enough founds"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def charge_pln(self, request):
         amount = request.data['amount']
         if not isinstance(amount, numbers.Real):

@@ -23,7 +23,7 @@ class BoughtCurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
         fields = (
-            'id', 'name', 'code', 'unit', 'sell_price'
+            'id', 'name', 'code', 'unit', 'sell_price', 'purchase_price'
         )
 
 
