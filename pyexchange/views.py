@@ -27,7 +27,7 @@ class CurrencyViewSet(GenericViewSet, ListModelMixin):
         profile = Profile.objects.get(user=user)
         currency = Currency.objects.get(pk=pk)
         amount = request.data['amount']
-        user_money_costs = amount * currency.sell_price / currency.unit
+        user_money_costs = amount * currency.purchase_price / currency.unit
         if user_money_costs > profile.money:
             return Response({'error': "User doesn't have enough founds"}, status=status.HTTP_400_BAD_REQUEST)
         if amount % currency.unit != 0 or amount <= 0:
@@ -48,7 +48,7 @@ class CurrencyViewSet(GenericViewSet, ListModelMixin):
             return Response({'error': "Amount is not multiple of unit"}, status=status.HTTP_400_BAD_REQUEST)
         user = request.user
         profile = Profile.objects.get(user=user)
-        exchanged_amount = amount * currency.purchase_price / currency.unit
+        exchanged_amount = amount * currency.sell_price / currency.unit
         exchange_succeeded = False
         with transaction.atomic():
             user_currency, created = UserCurrency.objects.get_or_create(currency=currency, owner=user)
@@ -56,6 +56,8 @@ class CurrencyViewSet(GenericViewSet, ListModelMixin):
                 user_currency.amount -= amount
                 profile.money += exchanged_amount
                 user_currency.save()
+                if user_currency.amount == 0:
+                    user_currency.delete()
                 profile.save()
                 exchange_succeeded = True
         if exchange_succeeded:
