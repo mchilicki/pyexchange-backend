@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    money = models.IntegerField(default=0)
+    money = models.FloatField(default=0)
 
     @receiver(post_save, sender=User)
     def create_profile(sender, instance, created, **kwargs):
@@ -29,7 +29,7 @@ class Currency(models.Model):
 class UserCurrency(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='currencies')
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
-    amount = models.IntegerField(default=0)
+    amount = models.FloatField(default=0)
 
 
 
